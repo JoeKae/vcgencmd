@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import vcgencmd, get_throttled_sources
+from . import vcgencmd
 
 import argparse
 import sys
@@ -49,7 +49,7 @@ def main(args):
          vcgencmd.memory_sources(),
          vcgencmd.get_mem)
     __do('Throttled Status',
-         get_throttled_sources(),
+         vcgencmd.get_throttled_sources(),
          vcgencmd.get_throttled)
 
 
