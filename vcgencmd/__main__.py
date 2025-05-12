@@ -12,44 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import vcgencmd
+from . import vcgencmd, get_throttled_sources
 
 import argparse
 import sys
 
 
 def __do(label, sources, function):
-  print('{0}:'.format(label))
-  for src in sources:
-    if src == '':
-      val = function()
-    else:
-      val = function(src)
-    print('  {0}{1}: {2}'.format(
-        src, ' ' * (10 - len(src)), str(val)))
+    print('{0}:'.format(label))
+    max_len = 1 + max(len(src) for src in sources)  # Find the longest source name
+    for src in sources:
+        if src == '':
+            val = function()
+        else:
+            val = function(src)
+        print('  {0}{1}: {2}'.format(
+            src, ' ' * (max_len - len(src)), str(val)))
 
 
 def main(args):
-  kTxtLen = 10
+    kTxtLen = 10
 
-  __do('Clock Frequencies (Hz)',
-       vcgencmd.frequency_sources(),
-       vcgencmd.measure_clock)
-  __do('Voltages (V)',
-       vcgencmd.voltage_sources(),
-       vcgencmd.measure_volts)
-  __do('Temperatures (C)',
-       [''],
-       vcgencmd.measure_temp)
-  __do('Codecs Enabled',
-       vcgencmd.codec_sources(),
-       vcgencmd.codec_enabled)
-  __do('Memory Allocation (bytes)',
-       vcgencmd.memory_sources(),
-       vcgencmd.get_mem)
+    __do('Clock Frequencies (Hz)',
+         vcgencmd.frequency_sources(),
+         vcgencmd.measure_clock)
+    __do('Voltages (V)',
+         vcgencmd.voltage_sources(),
+         vcgencmd.measure_volts)
+    __do('Temperatures (C)',
+         [''],
+         vcgencmd.measure_temp)
+    __do('Codecs Enabled',
+         vcgencmd.codec_sources(),
+         vcgencmd.codec_enabled)
+    __do('Memory Allocation (bytes)',
+         vcgencmd.memory_sources(),
+         vcgencmd.get_mem)
+    __do('Throttled Status',
+         get_throttled_sources(),
+         vcgencmd.get_throttled)
 
 
 if __name__ == '__main__':
-  parser = argparse.ArgumentParser()
-  args = parser.parse_args()
-  sys.exit(main(args))
+    parser = argparse.ArgumentParser()
+    args = parser.parse_args()
+    sys.exit(main(args))
